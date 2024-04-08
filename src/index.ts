@@ -1,10 +1,19 @@
 import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
-
+import { sequelize } from './db/connection';
+import productRoutes from './routes/products/products-routes';
 dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
+
+// Sync the model with the database
+sequelize.sync().then(() => {
+  console.log('Database synchronized');
+});
+app.use(express.json());
+
+app.use(productRoutes);
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Express + TypeScript Serversss');
