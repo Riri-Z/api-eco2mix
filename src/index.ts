@@ -2,6 +2,8 @@ import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import { sequelize } from './db/connection';
 import productRoutes from './routes/products/products-routes';
+import consommationEnergieRoutes from './routes/consommation_energie/consommation_energie-routes';
+
 dotenv.config();
 
 const app: Express = express();
@@ -14,6 +16,7 @@ sequelize.sync().then(() => {
 app.use(express.json());
 
 app.use(productRoutes);
+app.use(consommationEnergieRoutes);
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Express + TypeScript Serversss');
