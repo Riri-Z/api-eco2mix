@@ -1,0 +1,47 @@
+{
+    "name": "api-eco2mix",
+    "version": "1.0.0",
+    "description": "",
+    "main": "src/app.ts",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "npx tsc",
+        "start": "node dist/app.js",
+        "dev": "nodemon src/app.ts",
+        "format:check": "prettier --check .",
+        "format:write": "prettier --write .",
+        "lint:check": "eslint src/**/*.ts",
+        "lint:fix": "eslint src/**/*.ts --fix"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Riri-Z/api-eco2mix.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Riri-Z/api-eco2mix/issues"
+    },
+    "homepage": "https://github.com/Riri-Z/api-eco2mix#readme",
+    "dependencies": {
+        "dotenv": "^16.4.5",
+        "eslint": "^8.57.0",
+        "express": "^4.19.2"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.21",
+        "@types/node": "^20.12.5",
+        "eslint-config-prettier": "^9.1.0",
+        "globals": "^15.0.0",
+        "husky": "^9.0.11",
+        "nodemon": "^3.1.0",
+        "prettier": "^3.2.5",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.4.4"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "npm run lint:fix"
+        }
+    }
+}
