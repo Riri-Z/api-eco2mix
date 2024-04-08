@@ -119,9 +119,6 @@ dist
 # TernJS port file
 .tern-port
 
-# Database
-database.sqlite
-
 # Editor directories and files
 .vscode/
 

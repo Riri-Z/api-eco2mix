@@ -24,6 +24,25 @@ const getAllEnergieRecord = async (req: Request, res: Response) => {
   }
 };
 
+const getTotalElectriciteAndGazPerYear = async (req: Request, res: Response) => {
+  try {
+    const result = await ConsoEnergie.sequelize?.query(`
+    SELECT
+      annee,
+      filiere,
+      SUM(consototale) as consototale
+    FROM
+      ConsoEnergies
+    GROUP BY
+      annee,filiere
+  `);
+
+    res.json(result);
+  } catch (error) {
+    res.status(500).send(`Internal Server Error ${error}`);
+  }
+};
+
 const deleteOneRecord = async (req: Request, res: Response) => {
   try {
     const consoEnergieID = req.params.id;
@@ -39,4 +58,4 @@ const deleteOneRecord = async (req: Request, res: Response) => {
   }
 };
 
-export { createEnergieRecord, getAllEnergieRecord, deleteOneRecord };
+export { createEnergieRecord, getAllEnergieRecord, getTotalElectriciteAndGazPerYear, deleteOneRecord };
