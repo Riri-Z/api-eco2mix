@@ -5,8 +5,10 @@ import {
   getProductById,
   updateProductById,
   deleteProductById
-} from '../../controllers/products-controller';
+} from '../../product/products.controller';
+
 const productRoutes = express.Router();
+
 productRoutes
   .route('/products') // Create a new product
   .get(getAllProducts)
@@ -21,5 +23,5 @@ productRoutes
   .put(updateProductById)
   // Delete a product by ID
   .delete(deleteProductById);
-// Export the productRoutes
+
 export default productRoutes;
