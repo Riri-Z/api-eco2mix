@@ -37,7 +37,7 @@ const getTotalElectriciteAndGazPerYear = async (req: Request, res: Response) => 
       annee,filiere
   `);
 
-    res.json(result);
+    res.json(result?.[0]);
   } catch (error) {
     res.status(500).send(`Internal Server Error ${error}`);
   }
