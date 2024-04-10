@@ -5,7 +5,7 @@ import {
   getAllEnergieRecord,
   getTotalElectriciteAndGazPerYear,
   deleteOneRecord
-} from '../../consommation_energie/consommation_energie.controller';
+} from '../consommation_energie/consommation_energie.controller';
 
 const consommationEnergieRoutes = express.Router();
 
