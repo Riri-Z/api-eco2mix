@@ -124,14 +124,9 @@ const getDataByDateRange = async (req: Request, res: Response) => {
   let filterByDate = {};
   if (startDate && endDate) {
     filterByDate = {
-      [Op.or]: [
-        {
-          date_heure: {
-            [Op.between]: [startDate, endDate]
-          }
-        },
-        { date_heure: startDate }
-      ]
+      date_heure: {
+        [Op.between]: [startDate, endDate]
+      }
     };
   }
   try {
@@ -163,10 +158,9 @@ const getDataByDateRange = async (req: Request, res: Response) => {
       res.json({ recordFound: null });
     }
 
-    console.log('records found :', response.length);
-    res.json({ recordFound: response, recordLength: response.length });
+    res.json({ data: response, recordLength: response.length });
   } catch (error) {
-    res.json({ error: error });
+    res.json({ error: error, data: null });
   }
 };
 
@@ -186,8 +180,10 @@ const getOneByDateHour = async (req: Request, res: Response) => {
     res.json({ error: error });
   }
 };
-
-const populateTable_eco2_mix = async (req: Request, res: Response) => {
+/*
+TODO
+*/
+/* const populateTable_eco2_mix = async (req: Request, res: Response) => {
   console.log('populateTable_eco2_mix');
-};
+}; */
 export { createEco2mix, getOneByDateHour, getDataByDateRange };
