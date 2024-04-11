@@ -54,7 +54,7 @@ export const Eco2mix = sequelize.define<IEco2mixInstance>(
     id: {
       type: DataTypes.BIGINT,
       primaryKey: true,
-      autoIncrement: true // Si votre clé primaire est auto-incrémentée
+      autoIncrement: true
     },
     perimetre: {
       type: DataTypes.STRING,
