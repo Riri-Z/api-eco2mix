@@ -164,6 +164,22 @@ const getDataByDateRange = async (req: Request, res: Response) => {
   }
 };
 
+const getLastRecord = async (req: Request, res: Response) => {
+  try {
+    const response = await Eco2mix.findAll({
+      limit: 1,
+      order: [['date_heure', 'DESC']]
+    });
+    if (response === null) {
+      res.json(null);
+    } else {
+      res.json(response[0]);
+    }
+  } catch (error) {
+    res.json({ error: error });
+  }
+};
+
 const getOneByDateHour = async (req: Request, res: Response) => {
   const { date_heure } = req.body;
   try {
@@ -186,4 +202,4 @@ TODO
 /* const populateTable_eco2_mix = async (req: Request, res: Response) => {
   console.log('populateTable_eco2_mix');
 }; */
-export { createEco2mix, getOneByDateHour, getDataByDateRange };
+export { createEco2mix, getOneByDateHour, getDataByDateRange, getLastRecord };
