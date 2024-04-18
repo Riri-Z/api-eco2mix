@@ -30,6 +30,8 @@ interface Eco2MixEnergiesTrade {
   ech_comm_italie: number | null;
   ech_comm_suisse: number | null;
   ech_comm_allemagne_belgique: string | null;
+  heure: string;
+  date_heure: string;
 }
 
 const createEco2mix = async (req: Request, res: Response) => {
@@ -190,7 +192,9 @@ const getAllEnergiesTrade = async (req: Request, res: Response) => {
         'ech_comm_espagne',
         'ech_comm_italie',
         'ech_comm_suisse',
-        'ech_comm_allemagne_belgique'
+        'ech_comm_allemagne_belgique',
+        'date',
+        'date_heure'
       ],
       where: filterByDate
     });
