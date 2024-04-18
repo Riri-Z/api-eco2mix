@@ -24,6 +24,14 @@ interface Eco2MIxFormated {
   destockage_batterie: string;
 }
 
+interface Eco2MixEnergiesTrade {
+  ech_comm_angleterre: string | null;
+  ech_comm_espagne: number | null;
+  ech_comm_italie: number | null;
+  ech_comm_suisse: number | null;
+  ech_comm_allemagne_belgique: string | null;
+}
+
 const createEco2mix = async (req: Request, res: Response) => {
   try {
     const {
@@ -163,6 +171,39 @@ const getDataByDateRange = async (req: Request, res: Response) => {
     res.json({ error: error, data: null });
   }
 };
+const getAllEnergiesTrade = async (req: Request, res: Response) => {
+  const { startDate, endDate } = req.query;
+  let filterByDate = {};
+
+  if (startDate && endDate) {
+    filterByDate = {
+      date_heure: {
+        [Op.between]: [startDate, endDate]
+      }
+    };
+  }
+
+  try {
+    const response: Eco2MixEnergiesTrade[] | null = await Eco2mix.findAll({
+      attributes: [
+        'ech_comm_angleterre',
+        'ech_comm_espagne',
+        'ech_comm_italie',
+        'ech_comm_suisse',
+        'ech_comm_allemagne_belgique'
+      ],
+      where: filterByDate
+    });
+
+    if (response === null) {
+      res.json({ recordFound: null });
+    }
+
+    res.json({ data: response, recordLength: response.length });
+  } catch (error) {
+    res.json({ error: error, data: null });
+  }
+};
 
 const getLastRecord = async (req: Request, res: Response) => {
   try {
@@ -170,6 +211,7 @@ const getLastRecord = async (req: Request, res: Response) => {
       limit: 1,
       order: [['date_heure', 'DESC']]
     });
+
     if (response === null) {
       res.json(null);
     } else {
@@ -186,7 +228,7 @@ const getOneByDateHour = async (req: Request, res: Response) => {
     const isRecordExist = await Eco2mix.findOne({
       where: { date_heure: date_heure }
     });
-    console.log('isRecordExist', isRecordExist);
+
     if (isRecordExist === null) {
       res.json({ recordFound: null });
     } else {
@@ -202,4 +244,4 @@ TODO
 /* const populateTable_eco2_mix = async (req: Request, res: Response) => {
   console.log('populateTable_eco2_mix');
 }; */
-export { createEco2mix, getOneByDateHour, getDataByDateRange, getLastRecord };
+export { createEco2mix, getOneByDateHour, getDataByDateRange, getLastRecord, getAllEnergiesTrade };
