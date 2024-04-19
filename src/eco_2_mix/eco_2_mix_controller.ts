@@ -147,7 +147,7 @@ const getDataByDateRange = async (req: Request, res: Response) => {
   };
 
   try {
-    const response: Eco2MIxFormated[] | null = await Eco2mix.findAll({
+    const response: Partial<Eco2MIxFormated>[] | null = await Eco2mix.findAll({
       attributes: [
         'id',
         'perimetre',
@@ -165,7 +165,6 @@ const getDataByDateRange = async (req: Request, res: Response) => {
         'hydraulique',
         'pompage',
         'bioenergies',
-        'taux_co2',
         'stockage_batterie',
         'destockage_batterie'
       ],
@@ -180,6 +179,39 @@ const getDataByDateRange = async (req: Request, res: Response) => {
     res.json({ error: error, data: null });
   }
 };
+const getCo2Rate = async (req: Request, res: Response) => {
+  const { startDate, endDate } = req.query;
+
+  if (!startDate || !endDate) {
+    res.status(400).statusMessage;
+    return res.json({ erorr: 'Missing startDate OR endDate in query' });
+  }
+
+  const filterByDate = {
+    date: {
+      [Op.and]: {
+        [Op.gte]: startDate,
+        [Op.lte]: endDate
+      }
+    }
+  };
+
+  try {
+    const response: Partial<Eco2MIxFormated>[] | null = await Eco2mix.findAll({
+      attributes: ['id', 'taux_co2', 'heure', 'date', 'date_heure'],
+      where: filterByDate,
+      order: [['date_heure', 'ASC']]
+    });
+    if (response === null) {
+      return res.json({ recordFound: null });
+    }
+
+    res.json({ data: response, recordLength: response.length });
+  } catch (error) {
+    res.json({ error: error, data: null });
+  }
+};
+
 const getAllEnergiesTrade = async (req: Request, res: Response) => {
   const { startDate, endDate } = req.query;
 
@@ -198,7 +230,7 @@ const getAllEnergiesTrade = async (req: Request, res: Response) => {
   };
 
   try {
-    const response: Eco2MixEnergiesTrade[] | null = await Eco2mix.findAll({
+    const response: Partial<Eco2MixEnergiesTrade>[] | null = await Eco2mix.findAll({
       attributes: [
         'ech_comm_angleterre',
         'ech_comm_espagne',
@@ -260,4 +292,4 @@ TODO
 /* const populateTable_eco2_mix = async (req: Request, res: Response) => {
   console.log('populateTable_eco2_mix');
 }; */
-export { createEco2mix, getOneByDateHour, getDataByDateRange, getLastRecord, getAllEnergiesTrade };
+export { createEco2mix, getOneByDateHour, getDataByDateRange, getLastRecord, getAllEnergiesTrade, getCo2Rate };
