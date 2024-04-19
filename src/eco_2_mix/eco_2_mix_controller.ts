@@ -131,14 +131,21 @@ const createEco2mix = async (req: Request, res: Response) => {
 
 const getDataByDateRange = async (req: Request, res: Response) => {
   const { startDate, endDate } = req.query;
-  let filterByDate = {};
-  if (startDate && endDate) {
-    filterByDate = {
-      date_heure: {
-        [Op.between]: [startDate, endDate]
-      }
-    };
+
+  if (!startDate || !endDate) {
+    res.status(400).statusMessage;
+    return res.json({ erorr: 'Missing startDate OR endDate in query' });
   }
+
+  const filterByDate = {
+    date: {
+      [Op.and]: {
+        [Op.gte]: startDate,
+        [Op.lte]: endDate
+      }
+    }
+  };
+
   try {
     const response: Eco2MIxFormated[] | null = await Eco2mix.findAll({
       attributes: [
@@ -165,7 +172,7 @@ const getDataByDateRange = async (req: Request, res: Response) => {
       where: filterByDate
     });
     if (response === null) {
-      res.json({ recordFound: null });
+      return res.json({ recordFound: null });
     }
 
     res.json({ data: response, recordLength: response.length });
@@ -175,15 +182,20 @@ const getDataByDateRange = async (req: Request, res: Response) => {
 };
 const getAllEnergiesTrade = async (req: Request, res: Response) => {
   const { startDate, endDate } = req.query;
-  let filterByDate = {};
 
-  if (startDate && endDate) {
-    filterByDate = {
-      date_heure: {
-        [Op.between]: [startDate, endDate]
-      }
-    };
+  if (!startDate || !endDate) {
+    res.status(400).statusMessage;
+    return res.json({ erorr: 'Missing startDate OR endDate in query' });
   }
+
+  const filterByDate = {
+    date: {
+      [Op.and]: {
+        [Op.gte]: startDate,
+        [Op.lte]: endDate
+      }
+    }
+  };
 
   try {
     const response: Eco2MixEnergiesTrade[] | null = await Eco2mix.findAll({
