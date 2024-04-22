@@ -156,6 +156,8 @@ const getDataByDateRange = async (req: Request, res: Response) => {
         'heure',
         'date_heure',
         'consommation',
+        'prevision_j1',
+        'prevision_j',
         'fioul',
         'charbon',
         'gaz',
