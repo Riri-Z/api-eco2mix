@@ -170,7 +170,8 @@ const getDataByDateRange = async (req: Request, res: Response) => {
         'stockage_batterie',
         'destockage_batterie'
       ],
-      where: filterByDate
+      where: filterByDate,
+      order: [['date_heure', 'ASC']]
     });
     if (response === null) {
       return res.json({ recordFound: null });
@@ -256,9 +257,16 @@ const getAllEnergiesTrade = async (req: Request, res: Response) => {
 };
 
 const getLastRecord = async (req: Request, res: Response) => {
+  const filter = {
+    consommation: {
+      [Op.not]: null
+    }
+  };
+
   try {
     const response = await Eco2mix.findAll({
       limit: 1,
+      where: filter,
       order: [['date_heure', 'DESC']]
     });
 
