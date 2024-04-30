@@ -1,10 +1,15 @@
 import express from 'express';
 
-import { getAllFilterByDate, getAllConsommation } from '../consommation_energie/consommation_energie.controller';
+import {
+  getAllFilterByDate,
+  getAllConsommation,
+  getLastDateRecord
+} from '../consommation_energie/consommation_energie.controller';
 
 const consommationEnergieRoutes = express.Router();
 
 consommationEnergieRoutes.route('/consumption/all').get(getAllConsommation);
-consommationEnergieRoutes.route('/consumption/total-by-date').get(getAllFilterByDate);
+consommationEnergieRoutes.route('/consumption').get(getAllFilterByDate);
+consommationEnergieRoutes.route('/consumption/last-date-record').get(getLastDateRecord);
 
 export default consommationEnergieRoutes;

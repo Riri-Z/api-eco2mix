@@ -22,7 +22,7 @@ interface IConsoEnergie {
 export interface ConsoEnergieInstance extends Model<IConsoEnergie>, IConsoEnergie {}
 
 export const ConsoEnergie = sequelize.define<ConsoEnergieInstance>(
-  'Consommation',
+  'consommation',
   {
     id: {
       type: DataTypes.BIGINT,

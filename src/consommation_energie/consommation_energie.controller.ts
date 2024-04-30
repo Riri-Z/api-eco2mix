@@ -11,6 +11,30 @@ const getAllConsommation = async (req: Request, res: Response) => {
     res.status(500).send(`Internal Server Error ${error}`);
   }
 };
+const getLastDateRecord = async (req: Request, res: Response) => {
+  const filter = {
+    consommation: {
+      [Op.not]: null
+    }
+  };
+
+  try {
+    const response = await ConsoEnergie.findAll({
+      limit: 1,
+      attributes: ['date'],
+      where: filter,
+      order: [['date_heure', 'DESC']]
+    });
+
+    if (response === null) {
+      res.json(null);
+    } else {
+      res.json(response[0]);
+    }
+  } catch (error) {
+    res.json({ error: error });
+  }
+};
 
 const getAllFilterByDate = async (req: Request, res: Response) => {
   try {
@@ -56,4 +80,4 @@ const getAllFilterByDate = async (req: Request, res: Response) => {
   }
 };
 
-export { getAllFilterByDate, getAllConsommation };
+export { getAllFilterByDate, getAllConsommation, getLastDateRecord };
