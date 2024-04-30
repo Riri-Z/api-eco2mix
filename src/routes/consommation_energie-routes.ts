@@ -1,16 +1,10 @@
 import express from 'express';
 
-import {
-  createEnergieRecord,
-  getAllEnergieRecord,
-  getTotalElectriciteAndGazPerYear,
-  deleteOneRecord
-} from '../consommation_energie/consommation_energie.controller';
+import { getAllFilterByDate, getAllConsommation } from '../consommation_energie/consommation_energie.controller';
 
 const consommationEnergieRoutes = express.Router();
 
-consommationEnergieRoutes.route('/conso_gaz_elec').get(getAllEnergieRecord).post(createEnergieRecord);
-consommationEnergieRoutes.route('/total_conso_gaz_elec').get(getTotalElectriciteAndGazPerYear);
-consommationEnergieRoutes.route('/conso_gaz_elec/:id').delete(deleteOneRecord);
+consommationEnergieRoutes.route('/consumption/all').get(getAllConsommation);
+consommationEnergieRoutes.route('/consumption/total-by-date').get(getAllFilterByDate);
 
 export default consommationEnergieRoutes;

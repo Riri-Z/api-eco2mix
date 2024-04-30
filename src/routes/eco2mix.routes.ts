@@ -8,9 +8,9 @@ import {
 
 const eco2mixRoutes = express.Router();
 
-eco2mixRoutes.route('/eco2mix/totalproduction/').get(getDataByDateRange);
-eco2mixRoutes.route('/eco2mix/lastDateRecord').get(getLastDateRecord);
+eco2mixRoutes.route('/eco2mix/total-production').get(getDataByDateRange);
+eco2mixRoutes.route('/eco2mix/last-date-record').get(getLastDateRecord);
 eco2mixRoutes.route('/eco2mix/').get(getOneByDateHour);
-eco2mixRoutes.route('/eco2mix/').post(createEco2mix);
+eco2mixRoutes.route('/eco2mix/create').post(createEco2mix);
 
 export default eco2mixRoutes;

@@ -1,21 +1,9 @@
 import { Response, Request } from 'express';
 import { ConsoEnergie } from './consommation_energie.model';
 
-const createEnergieRecord = async (req: Request, res: Response) => {
-  try {
-    const { annee, filiere, consototale } = req.body;
-    const record = await ConsoEnergie.create({
-      annee,
-      filiere,
-      consototale
-    });
-    res.json({ message: 'createEnergieRecord successfully', record });
-  } catch (error) {
-    res.status(500).send(`Internal Server Error ${error}`);
-  }
-};
+import { Op } from 'sequelize';
 
-const getAllEnergieRecord = async (req: Request, res: Response) => {
+const getAllConsommation = async (req: Request, res: Response) => {
   try {
     const records = await ConsoEnergie.findAll();
     res.json(records);
@@ -24,38 +12,48 @@ const getAllEnergieRecord = async (req: Request, res: Response) => {
   }
 };
 
-const getTotalElectriciteAndGazPerYear = async (req: Request, res: Response) => {
+const getAllFilterByDate = async (req: Request, res: Response) => {
   try {
-    const result = await ConsoEnergie.sequelize?.query(`
-    SELECT
-      annee,
-      filiere,
-      SUM(consototale) as consototale
-    FROM
-      ConsoEnergies
-    GROUP BY
-      annee,filiere
-  `);
+    const { startDate, endDate } = req.query;
 
-    res.json(result?.[0]);
-  } catch (error) {
-    res.status(500).send(`Internal Server Error ${error}`);
-  }
-};
-
-const deleteOneRecord = async (req: Request, res: Response) => {
-  try {
-    const consoEnergieID = req.params.id;
-    const record = await ConsoEnergie.findByPk(consoEnergieID);
-    if (!record) {
-      res.status(404).send('record not found');
-    } else {
-      await record.destroy();
-      res.send('Product deleted successfully');
+    if (!startDate || !endDate) {
+      res.status(400).statusMessage;
+      return res.json({ erorr: 'Missing startDate OR endDate in query' });
     }
+
+    const filterByDate = {
+      date: {
+        [Op.and]: {
+          [Op.gte]: startDate,
+          [Op.lte]: endDate
+        }
+      }
+    };
+
+    const response = await ConsoEnergie.findAll({
+      attributes: [
+        'date_heure',
+        'date',
+        'heure',
+        'code_insee_region',
+        'region',
+        'consommation_brute_gaz_grtgaz',
+        'statut_grtgaz',
+        'consommation_brute_gaz_terega',
+        'statut_terega',
+        'consommation_brute_gaz_totale',
+        'consommation_brute_electricite_rte',
+        'statut_rte',
+        'consommation_brute_totale'
+      ],
+      where: filterByDate,
+      order: [['date_heure', 'ASC']]
+    });
+
+    res.json(response?.[0]);
   } catch (error) {
     res.status(500).send(`Internal Server Error ${error}`);
   }
 };
 
-export { createEnergieRecord, getAllEnergieRecord, getTotalElectriciteAndGazPerYear, deleteOneRecord };
+export { getAllFilterByDate, getAllConsommation };
