@@ -1,6 +1,6 @@
 import { Response, Request } from 'express';
 import { ConsoEnergie } from './consommation_energie.model';
-
+import { transformedData } from '../utils/dataTransformationConsumption';
 import { Op } from 'sequelize';
 
 const getAllConsommation = async (req: Request, res: Response) => {
@@ -12,17 +12,10 @@ const getAllConsommation = async (req: Request, res: Response) => {
   }
 };
 const getLastDateRecord = async (req: Request, res: Response) => {
-  const filter = {
-    consommation: {
-      [Op.not]: null
-    }
-  };
-
   try {
     const response = await ConsoEnergie.findAll({
       limit: 1,
       attributes: ['date'],
-      where: filter,
       order: [['date_heure', 'DESC']]
     });
 
@@ -37,22 +30,18 @@ const getLastDateRecord = async (req: Request, res: Response) => {
 };
 
 const getAllFilterByDate = async (req: Request, res: Response) => {
-  try {
-    const { startDate, endDate } = req.query;
+  const { date } = req.query;
 
-    if (!startDate || !endDate) {
-      res.status(400).statusMessage;
-      return res.json({ erorr: 'Missing startDate OR endDate in query' });
+  const filterByDate = {
+    date: {
+      [Op.eq]: date
     }
-
-    const filterByDate = {
-      date: {
-        [Op.and]: {
-          [Op.gte]: startDate,
-          [Op.lte]: endDate
-        }
-      }
-    };
+  };
+  try {
+    if (!date) {
+      res.status(400).statusMessage;
+      return res.json({ erorr: 'Missing date in query' });
+    }
 
     const response = await ConsoEnergie.findAll({
       attributes: [
@@ -62,19 +51,19 @@ const getAllFilterByDate = async (req: Request, res: Response) => {
         'code_insee_region',
         'region',
         'consommation_brute_gaz_grtgaz',
-        'statut_grtgaz',
         'consommation_brute_gaz_terega',
-        'statut_terega',
         'consommation_brute_gaz_totale',
         'consommation_brute_electricite_rte',
-        'statut_rte',
         'consommation_brute_totale'
       ],
       where: filterByDate,
       order: [['date_heure', 'ASC']]
     });
 
-    res.json(response?.[0]);
+    if (Array.isArray(response) && response.length > 0) {
+      const formatData = transformedData(response);
+      res.status(200).json(formatData);
+    }
   } catch (error) {
     res.status(500).send(`Internal Server Error ${error}`);
   }

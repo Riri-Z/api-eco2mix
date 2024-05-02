@@ -1,7 +1,7 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../db/connection';
 
-interface IConsoEnergie {
+export interface IConsoEnergie {
   id?: number;
   date_heure: string;
   date: string;
