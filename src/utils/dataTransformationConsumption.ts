@@ -14,7 +14,7 @@ interface ItransformedValue {
 enum regionMapping {
   'Bretagne' = 'fr-bre',
   'Pays de la Loire' = 'fr-pdl',
-  'Provence-Alpes-Côte d"Azur' = 'fr-pac',
+  "Provence-Alpes-Côte d'Azur" = 'fr-pac',
   'Occitanie' = 'fr-occ',
   'Nouvelle-Aquitaine' = 'fr-naq',
   'Bourgogne-Franche-Comté' = 'fr-bfc',
