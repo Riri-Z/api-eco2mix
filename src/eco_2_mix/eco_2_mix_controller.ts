@@ -24,16 +24,6 @@ interface Eco2MIxFormated {
   destockage_batterie: string;
 }
 
-interface Eco2MixEnergiesTrade {
-  ech_comm_angleterre: string | null;
-  ech_comm_espagne: number | null;
-  ech_comm_italie: number | null;
-  ech_comm_suisse: number | null;
-  ech_comm_allemagne_belgique: string | null;
-  heure: string;
-  date_heure: string;
-}
-
 const createEco2mix = async (req: Request, res: Response) => {
   try {
     const {
@@ -156,6 +146,7 @@ const getDataByDateRange = async (req: Request, res: Response) => {
         'heure',
         'date_heure',
         'consommation',
+        'taux_co2',
         'prevision_j1',
         'prevision_j',
         'fioul',
@@ -168,86 +159,18 @@ const getDataByDateRange = async (req: Request, res: Response) => {
         'pompage',
         'bioenergies',
         'stockage_batterie',
-        'destockage_batterie'
-      ],
-      where: filterByDate,
-      order: [['date_heure', 'ASC']]
-    });
-    if (response === null) {
-      return res.json({ recordFound: null });
-    }
-
-    res.json({ data: response, recordLength: response.length });
-  } catch (error) {
-    res.json({ error: error, data: null });
-  }
-};
-const getCo2Rate = async (req: Request, res: Response) => {
-  const { startDate, endDate } = req.query;
-
-  if (!startDate || !endDate) {
-    res.status(400).statusMessage;
-    return res.json({ erorr: 'Missing startDate OR endDate in query' });
-  }
-
-  const filterByDate = {
-    date: {
-      [Op.and]: {
-        [Op.gte]: startDate,
-        [Op.lte]: endDate
-      }
-    }
-  };
-
-  try {
-    const response: Partial<Eco2MIxFormated>[] | null = await Eco2mix.findAll({
-      attributes: ['id', 'taux_co2', 'heure', 'date', 'date_heure'],
-      where: filterByDate,
-      order: [['date_heure', 'ASC']]
-    });
-    if (response === null) {
-      return res.json({ recordFound: null });
-    }
-
-    res.json({ data: response, recordLength: response.length });
-  } catch (error) {
-    res.json({ error: error, data: null });
-  }
-};
-
-const getAllEnergiesTrade = async (req: Request, res: Response) => {
-  const { startDate, endDate } = req.query;
-
-  if (!startDate || !endDate) {
-    res.status(400).statusMessage;
-    return res.json({ erorr: 'Missing startDate OR endDate in query' });
-  }
-
-  const filterByDate = {
-    date: {
-      [Op.and]: {
-        [Op.gte]: startDate,
-        [Op.lte]: endDate
-      }
-    }
-  };
-
-  try {
-    const response: Partial<Eco2MixEnergiesTrade>[] | null = await Eco2mix.findAll({
-      attributes: [
+        'destockage_batterie',
         'ech_comm_angleterre',
         'ech_comm_espagne',
         'ech_comm_italie',
         'ech_comm_suisse',
-        'ech_comm_allemagne_belgique',
-        'date',
-        'date_heure'
+        'ech_comm_allemagne_belgique'
       ],
-      where: filterByDate
+      where: filterByDate,
+      order: [['date_heure', 'ASC']]
     });
-
     if (response === null) {
-      res.json({ recordFound: null });
+      return res.json({ recordFound: null });
     }
 
     res.json({ data: response, recordLength: response.length });
@@ -256,7 +179,7 @@ const getAllEnergiesTrade = async (req: Request, res: Response) => {
   }
 };
 
-const getLastRecord = async (req: Request, res: Response) => {
+const getLastDateRecord = async (req: Request, res: Response) => {
   const filter = {
     consommation: {
       [Op.not]: null
@@ -266,6 +189,7 @@ const getLastRecord = async (req: Request, res: Response) => {
   try {
     const response = await Eco2mix.findAll({
       limit: 1,
+      attributes: ['date'],
       where: filter,
       order: [['date_heure', 'DESC']]
     });
@@ -302,4 +226,4 @@ TODO
 /* const populateTable_eco2_mix = async (req: Request, res: Response) => {
   console.log('populateTable_eco2_mix');
 }; */
-export { createEco2mix, getOneByDateHour, getDataByDateRange, getLastRecord, getAllEnergiesTrade, getCo2Rate };
+export { createEco2mix, getOneByDateHour, getDataByDateRange, getLastDateRecord };

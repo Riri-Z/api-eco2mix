@@ -1,21 +1,9 @@
 import { Response, Request } from 'express';
 import { ConsoEnergie } from './consommation_energie.model';
+import { transformedData } from '../utils/dataTransformationConsumption';
+import { Op } from 'sequelize';
 
-const createEnergieRecord = async (req: Request, res: Response) => {
-  try {
-    const { annee, filiere, consototale } = req.body;
-    const record = await ConsoEnergie.create({
-      annee,
-      filiere,
-      consototale
-    });
-    res.json({ message: 'createEnergieRecord successfully', record });
-  } catch (error) {
-    res.status(500).send(`Internal Server Error ${error}`);
-  }
-};
-
-const getAllEnergieRecord = async (req: Request, res: Response) => {
+const getAllConsommation = async (req: Request, res: Response) => {
   try {
     const records = await ConsoEnergie.findAll();
     res.json(records);
@@ -23,39 +11,62 @@ const getAllEnergieRecord = async (req: Request, res: Response) => {
     res.status(500).send(`Internal Server Error ${error}`);
   }
 };
-
-const getTotalElectriciteAndGazPerYear = async (req: Request, res: Response) => {
+const getLastDateRecord = async (req: Request, res: Response) => {
   try {
-    const result = await ConsoEnergie.sequelize?.query(`
-    SELECT
-      annee,
-      filiere,
-      SUM(consototale) as consototale
-    FROM
-      ConsoEnergies
-    GROUP BY
-      annee,filiere
-  `);
+    const response = await ConsoEnergie.findAll({
+      limit: 1,
+      attributes: ['date'],
+      order: [['date_heure', 'DESC']]
+    });
 
-    res.json(result?.[0]);
+    if (response === null) {
+      res.json(null);
+    } else {
+      res.json(response[0]);
+    }
   } catch (error) {
-    res.status(500).send(`Internal Server Error ${error}`);
+    res.json({ error: error });
   }
 };
 
-const deleteOneRecord = async (req: Request, res: Response) => {
+const getAllFilterByDate = async (req: Request, res: Response) => {
+  const { date } = req.query;
+
+  const filterByDate = {
+    date: {
+      [Op.eq]: date
+    }
+  };
   try {
-    const consoEnergieID = req.params.id;
-    const record = await ConsoEnergie.findByPk(consoEnergieID);
-    if (!record) {
-      res.status(404).send('record not found');
-    } else {
-      await record.destroy();
-      res.send('Product deleted successfully');
+    if (!date) {
+      res.status(400).statusMessage;
+      return res.json({ erorr: 'Missing date in query' });
+    }
+
+    const response = await ConsoEnergie.findAll({
+      attributes: [
+        'date_heure',
+        'date',
+        'heure',
+        'code_insee_region',
+        'region',
+        'consommation_brute_gaz_grtgaz',
+        'consommation_brute_gaz_terega',
+        'consommation_brute_gaz_totale',
+        'consommation_brute_electricite_rte',
+        'consommation_brute_totale'
+      ],
+      where: filterByDate,
+      order: [['date_heure', 'ASC']]
+    });
+
+    if (Array.isArray(response) && response.length > 0) {
+      const formatData = transformedData(response);
+      res.status(200).json(formatData);
     }
   } catch (error) {
     res.status(500).send(`Internal Server Error ${error}`);
   }
 };
 
-export { createEnergieRecord, getAllEnergieRecord, getTotalElectriciteAndGazPerYear, deleteOneRecord };
+export { getAllFilterByDate, getAllConsommation, getLastDateRecord };
