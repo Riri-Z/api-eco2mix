@@ -1,6 +1,7 @@
 import { Response, Request } from 'express';
 import { Eco2mix } from './eco_2_mix_model';
 import { Op } from 'sequelize';
+import dataProcessing from '../utils/chartsConfiguration';
 
 interface Eco2MIxFormated {
   id?: number;
@@ -119,6 +120,43 @@ const createEco2mix = async (req: Request, res: Response) => {
   }
 };
 
+const getChartsConfigurations = async (req: Request, res: Response) => {
+  const { startDate, endDate } = req.query;
+
+  if (!startDate || !endDate) {
+    res.status(400).statusMessage;
+    return res.json({ erorr: 'Missing startDate OR endDate in query' });
+  }
+
+  /*
+  - Recuperation des data
+  - transformation des données
+  - push dans result  =  [config1,config2...]
+  - return resultx
+  */
+  try {
+    const data = await getDataByDateRange(req, res);
+    if (data) {
+      //transformation des données
+      const {
+        chartOptionsEco2Mix,
+        chartOptionsElectricityConsumption,
+        chartOptionsCo2Rate,
+        configurationChartCommercialTrade
+      } = dataProcessing(data, startDate.toString(), endDate.toString());
+      const result = [
+        chartOptionsEco2Mix,
+        chartOptionsElectricityConsumption,
+        chartOptionsCo2Rate,
+        configurationChartCommercialTrade
+      ];
+      return res.json(result);
+    }
+  } catch (error) {
+    res.json({ error: error, data: null });
+  }
+};
+
 const getDataByDateRange = async (req: Request, res: Response) => {
   const { startDate, endDate } = req.query;
 
@@ -170,12 +208,12 @@ const getDataByDateRange = async (req: Request, res: Response) => {
       order: [['date_heure', 'ASC']]
     });
     if (response === null) {
-      return res.json({ recordFound: null });
+      return { recordFound: null, response: null };
     }
 
-    res.json({ data: response, recordLength: response.length });
+    return response;
   } catch (error) {
-    res.json({ error: error, data: null });
+    return { error: error, response: null };
   }
 };
 
@@ -226,4 +264,4 @@ TODO
 /* const populateTable_eco2_mix = async (req: Request, res: Response) => {
   console.log('populateTable_eco2_mix');
 }; */
-export { createEco2mix, getOneByDateHour, getDataByDateRange, getLastDateRecord };
+export { createEco2mix, getOneByDateHour, getDataByDateRange, getLastDateRecord, getChartsConfigurations };
